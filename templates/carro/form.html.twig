@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carros{% endblock %}
+
+{% block body %}
+    <div class="col-sm-10 offset-sm-1 col-md-10 offset-md-1 col-lg-10 offset-lg-1 mt-3">
+        <div class="content-div">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Cadastrar carro</h4>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="row">
+                            <div class="form-group col-md-8">
+                                {{form_row(form.proprietario)}}
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                {{form_row(form.placa)}}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Marca</label>
+                                <select oldmodelo="{{form.vars.value.modelo ? form.vars.value.modelo.id : ''}}" class="form-control" id="marca" name="marca">
+                                    <option value="">Selecione uma opção</option>
+                                    {% for marca in marcas %}
+                                        <option {% if form.vars.value.modelo and form.vars.value.modelo.marca.id == marca.id %}selected{% endif %} value="{{marca.id}}">{{marca.nome}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <div>
+                                    {{form_row(form.modelo)}}
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 text-right mt-3">
+                                <button type="button" class="btn btn-primary sendForm">Salvar</a>
+                            </div>
+                        
+                        </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <script>
+
+        $("#carro_placa").mask("SSS-0000")
+    
+        search = (selected=null) => {
+
+            $.ajax({
+                type: "GET",
+                url: '/carro/modelos?marcas='+$('#marca').val(),
+                success: function (data) {
+
+                    $("#carro_modelo option").remove()
+                    
+                    $("#carro_modelo").append(`<option value="">Selecione uma opção</option>`)
+
+                    data.map(function(modelo){
+                        $("#carro_modelo").append(`<option ${selected && selected == String(modelo['id']) ? 'selected' : ''} value="${modelo['id']}">${modelo['nome']}</option>`)
+                    })
+
+                },
+            })
+
+        }
+
+        $(document).ready(function() {
+            $('.selectpicker').selectpicker();
+
+            if($('#marca').val()){
+                search($('#marca').attr('oldmodelo'))
+            }else{
+                $("#carro_modelo option").remove()
+                    
+                $("#carro_modelo").append(`<option value="">Selecione uma opção</option>`)
+            }
+
+            $('#marca').on('change', function(){
+                search()
+            });  
+
+            $('#form').validate({
+                rules: {			
+                    "carro[placa]":{
+                        required: true,
+                        validaPlaca: true,
+                    },
+                    "carro[proprietario]":{
+                        required: true,
+                    },
+                    "marca":{
+                        required: true,
+                    },
+                    "carro[modelo]":{
+                        required: true,
+                    },
+                },
+                messages:{}
+            })
+
+            $(".sendForm").on("click",function() {
+                if($("#form").valid())
+                    $("#form").submit()
+            })
+
+        });
+    </script>
+{% endblock %}

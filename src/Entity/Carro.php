@@ -57,7 +57,7 @@ class Carro
 
     public function setPlaca(string $placa): self
     {
-        $this->placa = $placa;
+        $this->placa = strtoupper($placa);
 
         return $this;
     }
