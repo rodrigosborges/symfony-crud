@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carros{% endblock %}
+
+{% block body %}
+    <div class="col-sm-10 offset-sm-1 col-md-10 offset-md-1 col-lg-10 offset-lg-1 mt-3">
+        <div class="content-div">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Carros</h4>
+                </div>
+                <div class="card-body">
+                    <form id="form">
+                        <div class="col-md-12 text-right">
+                            <a href="/carro/new" class="btn btn-primary">Cadastrar carro</a>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Pesquise por proprietário ou placa</label>
+                                <input class="form-control" type="text" value="{{ app.request.get('proprietarioplaca') }}" name="proprietarioplaca">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Marcas</label>
+                                <select name="marcas[]" id="marcas" multiple="multiple" class="form-control selectpicker">	
+                                    {% for marca in marcas %}
+                                        <option {% if marca.id|trans in app.request.get('marcas') %}selected{% endif %} value="{{marca.id}}">{{marca.nome}}</option>
+                                    {% endfor %}
+                                </select>
+                                <i style="font-size:12px">Selecione marcas para exibir modelos ou filtre por marcas</i>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label>Modelos</label>
+                                <select oldvalues="{{app.request.get('modelos')|json_encode()}}" name="modelos[]" id="modelos" multiple="multiple" class="form-control selectpicker">		
+
+                                </select>
+                                <i></i>
+                            </div>
+                            
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="sendForm">Pesquisar</button>
+                    </form>
+
+                    <div class="table-responsive mt-5">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Proprietário</th>
+                                <th>Placa</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for carro in carros %}
+                                    <tr>
+                                        <td>{{carro.proprietario}}</td>
+                                        <td>{{carro.placa}}</td>
+                                        <td>{{carro.modelo.nome}}</td>
+                                        <td>{{carro.modelo.marca.nome}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+    
+        search = (selected=null) => {
+
+            $.ajax({
+                type: "GET",
+                url: '/carro/modelos?marcas='+$('#marcas').val(),
+                success: function (data) {
+
+                    $("#modelos option").remove()
+
+                    data.map(function(modelo){
+                        $("#modelos").append(`<option ${selected && selected.includes(String(modelo['id'])) ? 'selected' : ''} value="${modelo['id']}">${modelo['nome']}</option>`)
+                    })
+
+                    $('#modelos').selectpicker('refresh');
+                },
+            })
+
+        }
+        $(document).ready(function() {
+            $('.selectpicker').selectpicker();
+
+            if($('#marcas').val()){
+                var oldmodelos = JSON.parse($('#modelos').attr('oldvalues'))
+                search(oldmodelos)
+            }
+
+            $('#marcas').on('change', function(){
+                if($(this).val()){
+                    var modelos = $("#modelos").val()
+                    search(modelos)
+                }
+            });  
+
+        });
+    </script>
+{% endblock %}
