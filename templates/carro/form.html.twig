@@ -7,7 +7,7 @@
         <div class="content-div">
             <div class="card">
                 <div class="card-header">
-                    <h4>Cadastrar carro</h4>
+                    <h4>{{form.vars.value.proprietario ? 'Editar' : 'Cadastrar'}} carro</h4>
                 </div>
                 <div class="card-body">
                     {{ form_start(form) }}
@@ -46,6 +46,10 @@
                     
                     {{ form_end(form) }}
                 </div>
+            </div>
+
+            <div class="col-md-12 text-center mt-5">
+                <a href="/carro" class="btn btn-primary">Voltar para o início</a>
             </div>
         </div>
     </div>

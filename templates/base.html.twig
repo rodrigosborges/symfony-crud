@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}{% endblock %}</title>
 
 	    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 	    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
@@ -15,6 +15,13 @@
         <div class="row">
             <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light border-bottom">
                 <a class="navbar-brand" href="/"> Início </a>
+                {% if app.user %}
+                <ul class="navbar-nav  ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Sair</a>
+                    </li>
+                </ul>
+                {% endif %}
             </nav>
         </div>
 
